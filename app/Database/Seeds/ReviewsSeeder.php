@@ -8,23 +8,19 @@ class ReviewsSeeder extends Seeder
 {
     public function run()
     {
-        $data = [
+        $data = [];
 
-            [
-                'user_id' => 2,
-                'kuliner_id' => 1,
-                'review' => 'Makanan enak dan murah',
-                'rating' => 5,
-            ],
-
-            [
-                'user_id' => 1,
-                'kuliner_id' => 2,
-                'review' => 'Tempat nyaman untuk nongkrong',
-                'rating' => 4,
-            ]
-
-        ];
+        for ($kulinerId = 1; $kulinerId <= 21; $kulinerId++) {
+            $rating = 3 + ($kulinerId % 3);
+            $data[] = [
+                'user_id' => $kulinerId % 2 === 0 ? 1 : 2,
+                'kuliner_id' => $kulinerId,
+                'review' => 'Tempatnya layak dicoba, harga masih ramah mahasiswa.',
+                'rating' => $rating,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ];
+        }
 
         $this->db->table('reviews')->insertBatch($data);
     }

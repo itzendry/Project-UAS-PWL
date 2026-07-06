@@ -15,11 +15,11 @@ class KulinerApi extends BaseController
 
         $model = new KulinerModel();
 
-        // Jika tidak pakai filter lokasi → tampilkan semua data
         if (!$lat || !$lng || !$radius) {
             $data = $model
                 ->select('kuliner.*, categories.nama_kategori')
                 ->join('categories', 'categories.id = kuliner.category_id', 'left')
+                ->where('kuliner.status', 'approved')
                 ->findAll();
 
             return $this->response->setJSON([
@@ -30,7 +30,6 @@ class KulinerApi extends BaseController
             ]);
         }
 
-        // QUERY RADIUS (Haversine Formula)
         $db = \Config\Database::connect();
 
         $sql = "
@@ -46,6 +45,9 @@ class KulinerApi extends BaseController
         ) AS distance
         FROM kuliner
         LEFT JOIN categories ON categories.id = kuliner.category_id
+        WHERE kuliner.status = 'approved'
+        AND latitude IS NOT NULL
+        AND longitude IS NOT NULL
         HAVING distance <= ?
         ORDER BY distance ASC
         ";
@@ -72,6 +74,7 @@ class KulinerApi extends BaseController
         $data = $model
             ->select('kuliner.*, categories.nama_kategori')
             ->join('categories', 'categories.id = kuliner.category_id', 'left')
+            ->where('kuliner.status', 'approved')
             ->find($id);
 
         if (!$data) {

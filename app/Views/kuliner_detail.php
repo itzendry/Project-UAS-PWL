@@ -1,217 +1,172 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <title>Detail Kuliner - Premium</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" 
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= esc($k['nama_tempat']) ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        body {
-            background-color: #F4F7FE;
-            font-family: 'Poppins', sans-serif;
-            color: #2B3674;
-        }
-
-        .sidebar {
-            width: 280px;
-            background-color: #111C43;
-            color: white;
-            border-radius: 20px;
-            margin: 20px;
-            box-shadow: 0 10px 30px rgba(17, 28, 67, 0.15);
-        }
-
-        .sidebar .nav-link {
-            color: #A3AED0;
-            border-radius: 12px;
-            padding: 12px 18px;
-            margin-bottom: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            display: block;
-        }
-
-        .sidebar .nav-link.active {
-            background-color: #3A57E8;
-            color: white;
-        }
-
-        .main-content {
-            height: 100vh;
-            overflow-y: auto;
-            padding: 30px 40px !important;
-        }
-
-        .card-custom {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0px 10px 40px rgba(112, 144, 176, 0.08);
-            overflow: hidden;
-        }
-
-        .detail-img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-        }
-
-        .detail-no-pic {
-            width: 100%;
-            height: 350px;
-            background-color: #E9EDF7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid #E0E5F2;
-        }
-
-        .btn-back {
-            background-color: #E9EDF7;
-            color: #3A57E8;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-back:hover {
-            background-color: #3A57E8;
-            color: white;
-        }
-
-        .star-rating { color: #FFB547; font-size: 1.2rem; }
-        .kategori-badge { background-color: #F4F7FE; color: #47548C; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; border: 1px solid #E0E5F2; }
-        .info-box { background-color: #F8FAFC; border-radius: 12px; padding: 15px; border: 1px solid #E0E5F2; }
-        .btn-logout { background: rgba(255, 255, 255, 0.08); color: white; border-radius: 12px; transition: all 0.3s ease; border: 1px solid transparent; }
-        .btn-logout:hover { background: #EE5D50; color: white; transform: translateY(-3px); }
+        body { background: #f5f7fb; color: #1f2a44; }
+        .navbar { background: #111c43; }
+        .card { border: 0; border-radius: 8px; box-shadow: 0 10px 28px rgba(17, 28, 67, .08); }
+        .hero-img { width: 100%; max-height: 420px; object-fit: cover; background: #e8edf6; }
+        #map { height: 320px; border-radius: 8px; }
     </style>
 </head>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <body>
-
-    <div class="d-flex vh-100">
-
-        <div class="sidebar d-none d-md-flex flex-column p-4 flex-shrink-0">
-            <div class="text-center mb-5 mt-3">
-                <img src="<?= base_url('assets/chef.png'); ?>" style="height:100px;" class="mb-2" alt="Logo">
-                <h4 class="fw-bold text-white">Kuliner</h4>
-            </div>
-            <ul class="nav flex-column mb-auto">
-                <li class="nav-item">
-                    <a href="/kuliner" class="nav-link active">Data Tempat</a>
-
-                    <li class="nav-item">
-                    <a href="/kuliner/my-favorites" class="nav-link <?= url_is('kuliner/my-favorites') ? 'active' : '' ?>">
-                        Favorit
-                    </a>
-                </li>
-                </li>
-            </ul>
-            <div class="mt-auto">
-                <a href="/logout" class="btn btn-logout w-100 py-2 fw-bold text-center">Logout</a>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">KulinerZone</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="<?= session()->get('login') ? '/kuliner' : '/browse' ?>">Daftar Kuliner</a>
+            <?php if (session()->get('login')): ?>
+                <a class="nav-link" href="/logout">Logout</a>
+            <?php else: ?>
+                <a class="nav-link" href="/login">Login</a>
+            <?php endif; ?>
         </div>
+    </div>
+</nav>
 
-        <div class="main-content flex-grow-1">
+<main class="container py-4">
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+    <?php endif; ?>
 
-            <div class="mb-4">
-                <a href="/kuliner" class="btn-back">
-                    ⬅ Kembali ke Daftar
-                </a>
-            </div>
-
-            <div class="card card-custom mb-5">
-                
-                <?php if (!empty($k['foto']) && $k['foto'] != 'default.png'): ?>
-                    <img src="<?= base_url('uploads/kuliner/' . $k['foto']); ?>" class="detail-img" alt="Foto">
-                <?php else: ?>
-                    <div class="detail-no-pic">
-                        <h5 class="text-muted fw-bold">Tidak Ada Foto Tempat</h5>
-                    </div>
-                <?php endif; ?>
-
-                <div class="card-body p-5">
-                    
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-                        <div>
-                            <h2 class="fw-bold mb-2" style="color: #111C43;"><?= $k['nama_tempat']; ?></h2>
-                            <span class="kategori-badge"><?= $k['nama_kategori']; ?></span>
-                        </div>
-                        <div class="text-lg-end">
-                            <div class="star-rating mb-1">
-                                <?= str_repeat('⭐', $k['rating']); ?>
-                            </div>
-                            <small class="text-muted">Rating dari Pengguna</small>
-                        </div>
-                    </div>
-
-                    <hr class="my-4" style="color: #E0E5F2;">
-
-                    <div class="mb-4">
-                        <h5 class="fw-bold mb-2" style="color: #111C43;">📍 Alamat</h5>
-                        <p class="fs-6 text-secondary"><?= $k['alamat']; ?></p>
-                    </div>
-
-                    <div class="mt-3">
-    <h6 class="fw-bold">Lokasi</h6>
-
-    <div id="map" style="height: 300px; border-radius: 12px;"></div>
-</div>
-
-                    <div class="mb-4">
-                        <h5 class="fw-bold mb-2" style="color: #111C43;">📖 Deskripsi</h5>
-                        <p class="text-secondary" style="line-height: 1.7; white-space: pre-line;">
-                            <?= !empty($k['deskripsi']) ? $k['deskripsi'] : 'Belum ada deskripsi fasilitas untuk tempat ini.'; ?>
-                        </p>
-                    </div>
-
-                    <div class="p-4 border-start border-4 border-primary bg-light rounded-end">
-                        <h5 class="fw-bold mb-2" style="color: #111C43;">💬 Review Pengguna</h5>
-                        <p class="text-secondary mb-0" style="font-style: italic; line-height: 1.7; white-space: pre-line;">
-                            "<?= $k['review']; ?>"
-                        </p>
-                    </div>
-
+    <div class="card overflow-hidden mb-4">
+        <?php if (! empty($k['foto']) && $k['foto'] !== 'default.png'): ?>
+            <img class="hero-img" src="<?= base_url('uploads/kuliner/' . $k['foto']) ?>" alt="<?= esc($k['nama_tempat']) ?>">
+        <?php else: ?>
+            <div class="hero-img d-flex align-items-center justify-content-center text-muted">Tidak ada foto tempat</div>
+        <?php endif; ?>
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between flex-wrap gap-3 mb-3">
+                <div>
+                    <h2 class="fw-bold mb-2"><?= esc($k['nama_tempat']) ?></h2>
+                    <span class="badge bg-primary-subtle text-primary"><?= esc($k['nama_kategori']) ?></span>
+                    <span class="badge bg-light text-dark"><?= esc($k['status']) ?></span>
+                </div>
+                <div class="text-md-end">
+                    <strong class="fs-4"><?= (int) $k['rating'] ?>/5</strong><br>
+                    <small class="text-muted">Rating rata-rata</small>
                 </div>
             </div>
-
+            <p class="text-muted mb-3"><?= esc($k['alamat']) ?></p>
+            <p style="white-space: pre-line"><?= esc($k['deskripsi'] ?: 'Belum ada deskripsi untuk tempat ini.') ?></p>
+            <?php if (session()->get('login')): ?>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-outline-danger btn-sm" href="/kuliner/favorite/<?= $k['id'] ?>">Simpan Favorit</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/kuliner/mark-closed/<?= $k['id'] ?>">Tandai Tutup Permanen</a>
+                    <?php if (session()->get('role') === 'admin' || (int) $k['user_id'] === (int) session()->get('user_id')): ?>
+                        <a class="btn btn-outline-primary btn-sm" href="/kuliner/edit/<?= $k['id'] ?>">Edit Tempat</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <?php if (! empty($photos)): ?>
+        <div class="card p-4 mb-4">
+            <h5 class="fw-bold mb-3">Galeri Foto</h5>
+            <div class="row g-3">
+                <?php foreach ($photos as $photo): ?>
+                    <div class="col-md-4">
+                        <img class="w-100 rounded" style="height: 180px; object-fit: cover;" src="<?= base_url('uploads/kuliner/thumbs/' . $photo['foto']) ?>" onerror="this.src='<?= base_url('uploads/kuliner/' . $photo['foto']) ?>'" alt="Foto <?= esc($k['nama_tempat']) ?>">
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
-</html>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">Lokasi</h5>
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">Tulis Review</h5>
+                <?php if (session()->get('login')): ?>
+                    <form action="/kuliner/review/<?= $k['id'] ?>" method="post">
+                        <?= csrf_field() ?>
+                        <label class="form-label">Rating</label>
+                        <select class="form-select mb-3" name="rating" required>
+                            <?php for ($i = 5; $i >= 1; $i--): ?>
+                                <option value="<?= $i ?>"><?= $i ?> bintang</option>
+                            <?php endfor; ?>
+                        </select>
+                        <label class="form-label">Review</label>
+                        <textarea class="form-control mb-3" name="review" rows="4" required></textarea>
+                        <button class="btn btn-primary w-100">Kirim Review</button>
+                    </form>
+                <?php else: ?>
+                    <p class="text-muted mb-3">Login untuk menulis review dan menyimpan tempat favorit.</p>
+                    <a class="btn btn-primary" href="/login">Login</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 
+    <div class="card p-4 mt-4">
+        <h5 class="fw-bold mb-3">Review Pengunjung</h5>
+        <?php foreach ($reviews as $review): ?>
+            <div class="border-bottom py-3">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <strong><?= esc($review['nama_user'] ?? 'Pengguna') ?></strong>
+                        <span class="badge bg-warning text-dark"><?= (int) $review['rating'] ?>/5</span>
+                    </div>
+                    <small class="text-muted"><?= esc($review['created_at']) ?></small>
+                </div>
+                <p class="mb-2 mt-2"><?= esc($review['review']) ?></p>
+                <?php $canEditReview = session()->get('login') && (int) $review['user_id'] === (int) session()->get('user_id') && strtotime($review['created_at']) >= strtotime('-24 hours'); ?>
+                <?php if ($canEditReview): ?>
+                    <form action="/kuliner/review/update/<?= $review['id'] ?>" method="post" class="row g-2 mt-2">
+                        <?= csrf_field() ?>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="rating">
+                                <?php for ($i = 5; $i >= 1; $i--): ?>
+                                    <option value="<?= $i ?>" <?= (int) $review['rating'] === $i ? 'selected' : '' ?>><?= $i ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <input class="form-control form-control-sm" name="review" value="<?= esc($review['review']) ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-sm btn-outline-primary w-100">Update</button>
+                        </div>
+                    </form>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+        <?php if (empty($reviews)): ?>
+            <p class="text-muted mb-0">Belum ada review.</p>
+        <?php endif; ?>
+    </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const lat = <?= $k['latitude'] ?? 0 ?>;
-    const lng = <?= $k['longitude'] ?? 0 ?>;
+const lat = Number(<?= json_encode($k['latitude']) ?>);
+const lng = Number(<?= json_encode($k['longitude']) ?>);
 
-    if (lat && lng) {
-
-        const map = L.map('map').setView([lat, lng], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        L.marker([lat, lng])
-            .addTo(map)
-            .bindPopup("<?= $k['nama_tempat'] ?>")
-            .openPopup();
-
-    } else {
-
-        document.getElementById('map').innerHTML =
-            "<p class='text-muted'>Lokasi tidak tersedia</p>";
-
-    }
+if (lat && lng) {
+    const map = L.map('map').setView([lat, lng], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    L.marker([lat, lng]).addTo(map).bindPopup(<?= json_encode($k['nama_tempat']) ?>).openPopup();
+} else {
+    document.getElementById('map').innerHTML = '<div class="h-100 d-flex align-items-center justify-content-center text-muted">Lokasi belum tersedia.</div>';
+}
 </script>
+</body>
+</html>

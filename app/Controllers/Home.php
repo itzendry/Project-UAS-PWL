@@ -14,8 +14,8 @@ class Home extends BaseController
             ->join('categories', 'categories.id = kuliner.category_id', 'left')
             ->where('status', 'approved')
             ->orderBy('id', 'DESC') 
-            ->limit(6) 
-            ->find();
+            ->limit(6)
+            ->findAll();
 
 
         return view('home', $data); 

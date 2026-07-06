@@ -237,8 +237,8 @@
                             </div>
 
                             <div class="p-3 border-top mt-auto bg-light">
-                                <a href="/kuliner/detail/<?= $k['id']; ?>" class="btn-selengkapnya">
-                                    Baca Selengkapnya ➔
+                                <a href="/detail/<?= $k['id']; ?>" class="btn-selengkapnya">
+                                    Baca Selengkapnya
                                 </a>
                             </div>
 

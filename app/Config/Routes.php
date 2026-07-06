@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->get('/', 'Home::index');
+$routes->get('/browse', 'Kuliner::publicBrowse');
+$routes->get('/detail/(:num)', 'Kuliner::publicDetail/$1');
 
 
 // ===================== AUTH =====================
@@ -30,6 +32,9 @@ $routes->group('kuliner', ['filter' => 'auth'], static function ($routes) {
     $routes->post('save', 'Kuliner::save');
 
     $routes->get('detail/(:num)', 'Kuliner::detail/$1');
+    $routes->post('review/(:num)', 'Kuliner::addReview/$1');
+    $routes->post('review/update/(:num)', 'Kuliner::updateReview/$1');
+    $routes->get('mark-closed/(:num)', 'Kuliner::markClosed/$1');
 
     $routes->get('edit/(:num)', 'Kuliner::edit/$1');
     $routes->post('update/(:num)', 'Kuliner::update/$1');
@@ -44,7 +49,7 @@ $routes->group('kuliner', ['filter' => 'auth'], static function ($routes) {
 
 
 // ===================== ADMIN =====================
-$routes->group('admin', ['filter' => 'auth'], static function ($routes) {
+$routes->group('admin', ['filter' => 'authrole:admin'], static function ($routes) {
 
     $routes->get('dashboard', 'Admin::dashboard');
 
@@ -57,6 +62,7 @@ $routes->group('admin', ['filter' => 'auth'], static function ($routes) {
 
     $routes->get('categories', 'Category::index');
     $routes->post('categories/save', 'Category::save');
+    $routes->get('categories/delete/(:num)', 'Category::delete/$1');
 });
 
 
