@@ -38,6 +38,22 @@ class CreateUsers extends Migration
                 'default' => 'user',
             ],
 
+            // ==========================================
+            // KOLOM BARU UNTUK FITUR VERIFIKASI EMAIL
+            // ==========================================
+            'status' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
+                'default'    => 'inactive',
+            ],
+
+            'token' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
+                'null'       => true,
+            ],
+            // ==========================================
+
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
