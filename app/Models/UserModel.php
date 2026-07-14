@@ -10,11 +10,14 @@ class UserModel extends Model
 
     protected $primaryKey = 'id';
 
+    // TAMBAHKAN 'status' DAN 'token' DI SINI
     protected $allowedFields = [
         'nama',
         'email',
         'password',
-        'role'
+        'role',
+        'status',
+        'token'
     ];
 
     protected $useTimestamps = true;

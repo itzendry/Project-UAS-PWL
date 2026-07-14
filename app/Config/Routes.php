@@ -20,7 +20,7 @@ $routes->post('/register/proses', 'Auth::prosesRegister');
 
 $routes->get('/logout', 'Auth::logout');
 
-
+$routes->get('/auth/verifikasi/(:any)', 'Auth::verifikasi/$1');
 // ===================== KULINER (LOGIN REQUIRED) =====================
 $routes->group('kuliner', ['filter' => 'auth'], static function ($routes) {
 
