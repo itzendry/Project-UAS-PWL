@@ -1,69 +1,163 @@
-# CodeIgniter 4 Application Starter
+# KulinerZone - Lokasi Kuliner & Review Jajanan
 
-## What is CodeIgniter?
+Project CodeIgniter 4 untuk menemukan, menambahkan, dan mengulas tempat kuliner di sekitar kampus. Aplikasi mendukung submit tempat kuliner, geocoding alamat ke koordinat, peta Leaflet, review/rating, favorit, dashboard admin, dan API kuliner.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Tech Stack
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- CodeIgniter 4
+- MySQL
+- Bootstrap
+- Leaflet.js
+- OpenStreetMap Nominatim API
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Cara Instalasi
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+1. Masuk ke folder project:
 
-## Installation & updates
+```bash
+cd kuliner-app
+```
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+2. Install dependency Composer:
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+```bash
+composer install
+```
 
-## Setup
+3. Copy file environment jika belum ada:
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```bash
+copy env .env
+```
 
-## Important Change with index.php
+4. Buat database MySQL:
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+```sql
+CREATE DATABASE kuliner_db;
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+5. Jalankan migration:
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```bash
+php spark migrate
+```
 
-## Repository Management
+6. Jalankan seeder:
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+```bash
+php spark db:seed DatabaseSeeder
+```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+7. Jalankan server lokal:
 
-## Server Requirements
+```bash
+php spark serve
+```
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+8. Buka aplikasi:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+```text
+http://127.0.0.1:8080
+```
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+## Konfigurasi .env
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Pastikan file `.env` berisi konfigurasi berikut:
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+```ini
+CI_ENVIRONMENT = development
+
+app.baseURL = 'http://127.0.0.1:8080/'
+
+database.default.hostname = localhost
+database.default.database = kuliner_db
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+database.default.DBPrefix =
+database.default.port = 3306
+```
+
+Jika MySQL memakai password, isi bagian:
+
+```ini
+database.default.password = password_mysql_kamu
+```
+
+## Akun Demo
+
+Seeder menyediakan dua akun demo:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@gmail.com` | `admin123` |
+| User | `user@gmail.com` | `user12345` |
+
+## Fitur Utama
+
+- Login dan register user
+- Dashboard user untuk submit tempat kuliner
+- Geocoding alamat otomatis menggunakan Nominatim
+- Peta lokasi menggunakan Leaflet.js
+- Review dan rating kuliner
+- Simpan tempat favorit
+- Admin dashboard
+- Moderasi tempat kuliner approve/reject
+- Moderasi review
+- Kelola kategori
+- Upload foto kuliner dengan resize dan thumbnail
+- API webservice kuliner
+- Seeder 20+ data kuliner sekitar kampus
+
+## Webservice API
+
+Endpoint API yang tersedia:
+
+```text
+GET /api/kuliner
+GET /api/kuliner/{id}
+GET /api/kuliner?lat=-6.982050&lng=110.409140&radius=2
+```
+
+Contoh:
+
+```text
+http://127.0.0.1:8080/api/kuliner
+```
+
+API mengembalikan data dalam format JSON, berisi nama tempat, alamat, deskripsi, kategori, rating, foto, latitude, longitude, dan distance jika memakai radius.
+
+## Screenshot Fitur Utama
+
+### Halaman Browse Kuliner
+
+![Halaman Browse Kuliner](docs/screenshots/browsekuliner.jpeg)
+
+### Form Submit Tempat Kuliner
+
+![Form Submit Tempat Kuliner](docs/screenshots/submitkuliner.jpeg)
+
+### Dashboard Admin
+
+![Dashboard Admin](docs/screenshots/dashboardadmin.jpeg)
+
+### Dashboard User
+
+![Dashboard User](docs/screenshots/dashboarduser.jpeg)
+
+### Halaman Favorit User
+
+![Halaman Favorit User](docs/screenshots/halamanfavorituser.jpeg)
+
+## Struktur Koding Penting
+
+| Bagian | File |
+| --- | --- |
+| Route aplikasi | `app/Config/Routes.php` |
+| Controller kuliner | `app/Controllers/Kuliner.php` |
+| Controller API | `app/Controllers/API/KulinerApi.php` |
+| Client API | `app/Controllers/ClientKuliner.php` |
+| Model kuliner | `app/Models/KulinerModel.php` |
+| Seeder kuliner | `app/Database/Seeds/KulinerSeeder.php` |
+| View daftar kuliner | `app/Views/kuliner_view.php` |
+| View detail kuliner | `app/Views/kuliner_detail.php` |
